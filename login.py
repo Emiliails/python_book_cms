@@ -70,7 +70,6 @@ class Ui_MainWindow(object):
     def do_login(self):
         username = self.teUsername.toPlainText()
         password = self.tePassword.toPlainText()
-        print("do login")
         print('username:' + username)
         print('password:' + password)
 
