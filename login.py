@@ -7,16 +7,16 @@
 # WARNING! All changes made in this file will be lost!
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtWidgets import QApplication, QDialog, QLabel
 import sys
 
+from mw import Ui_MainWindow as wMain
+from mainDialog import Ui_Dialog as mDialog
 from LYUtils import DBManager as DBM
-
-from mainwindow import Ui_Form as MainDialog
-
 
 class Ui_MainWindow(object):
 
-    def __init__(self):
+    def __init__(self, MainWindow):
         self.setupUi(MainWindow)
 
     def setupUi(self, MainWindow):
@@ -63,9 +63,9 @@ class Ui_MainWindow(object):
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
         self.btnLogin.setText(_translate("MainWindow", "Login"))
 
-    def init_ui_action(self):
+    def init_ui_action(self, dialog):
         self.btnLogin.clicked.connect(self.do_login)
-        self.ui_main_window = MainDialog()
+        self.dialog = dialog
 
     def do_login(self):
         username = self.teUsername.toPlainText()
@@ -76,17 +76,16 @@ class Ui_MainWindow(object):
 
         dbManager = DBM()
         ret = dbManager.check_user(username, password)
-        if ret:
-            Form = Qt
-            mw = MainDialog()
-            
 
 
-if __name__ == "__main__":
-    app = QtWidgets.QApplication(sys.argv)  # 创建一个QApplication，也就是你要开发的软件app
-    MainWindow = QtWidgets.QMainWindow()    # 创建一个QMainWindow，用来装载你需要的各种组件、控件
-    ui = Ui_MainWindow()                    # ui是Ui_MainWindow()类的实例化对象
-    ui.init_ui_action()
-    MainWindow.show()                       # 执行QMainWindow的show()方法，显示这个QMainWindow
-    sys.exit(app.exec_())                   # 使用exit()或者点击关闭按钮退出QApplication
+        self.dialog.init_ui({'username':username})
+        self.dialog.setModal(True)        
+        self.dialog.setupUi(self.dialog)
+        self.dialog.show()
+        
+        #if ret:
+        #MainDialog = QDialog()
+        #dia = Ui_Dialog()
+        #dia.setupUi(MainDialog)
+        #MainDialog.show()
 
