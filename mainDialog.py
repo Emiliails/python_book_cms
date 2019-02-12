@@ -10,6 +10,8 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import QApplication, QDialog, QLabel
 
+import BookApp as app
+
 class Ui_Dialog(QDialog):
 
     def init_ui(self, params):
@@ -60,4 +62,10 @@ class Ui_Dialog(QDialog):
         self.pushButton_3.setText(_translate("Dialog", "Sale"))
         self.pushButton_2.setText(_translate("Dialog", "Add"))
         self.pushButton_4.setText(_translate("Dialog", "Setting"))
+        
+    def init_ui_action(self):
+        self.pushButton_2.clicked.connect(self.do_exit)
+
+    def do_exit(self):
+        app.show_window('login')
 

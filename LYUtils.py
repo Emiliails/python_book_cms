@@ -23,3 +23,11 @@ class DBManager(object):
         print('illege user!')
         return False
 
+    def insert(self, bookInfo):
+        pass
+
+    def delete(self, bookInfo):
+        pass
+
+    def search(self, bookInfo):
+        pass

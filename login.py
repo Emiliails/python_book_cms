@@ -14,9 +14,12 @@ from mw import Ui_MainWindow as wMain
 from mainDialog import Ui_Dialog as mDialog
 from LYUtils import DBManager as DBM
 
+import BookApp as app
+
 class Ui_MainWindow(object):
 
     def __init__(self, MainWindow):
+        self.window = MainWindow
         self.setupUi(MainWindow)
 
     def setupUi(self, MainWindow):
@@ -65,7 +68,6 @@ class Ui_MainWindow(object):
 
     def init_ui_action(self, dialog):
         self.btnLogin.clicked.connect(self.do_login)
-        self.dialog = dialog
 
     def do_login(self):
         username = self.teUsername.toPlainText()
@@ -76,10 +78,15 @@ class Ui_MainWindow(object):
         dbManager = DBM()
         ret = dbManager.check_user(username, password)
 
-        self.dialog.init_ui({'username':username})
-        self.dialog.setModal(True)        
-        self.dialog.setupUi(self.dialog)
-        self.dialog.show()
+        dialog = app.get_window('d1')
+
+        dialog.init_ui({'username':username})
+        dialog.setModal(True)        
+        dialog.setupUi(dialog)
+        dialog.init_ui_action()
+        dialog.show()
+
+        app.hide_window('login')
         
         #if ret:
         #MainDialog = QDialog()
