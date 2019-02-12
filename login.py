@@ -77,7 +77,6 @@ class Ui_MainWindow(object):
         dbManager = DBM()
         ret = dbManager.check_user(username, password)
 
-
         self.dialog.init_ui({'username':username})
         self.dialog.setModal(True)        
         self.dialog.setupUi(self.dialog)
