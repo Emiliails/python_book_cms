@@ -6,11 +6,72 @@
 #
 # WARNING! All changes made in this file will be lost!
 
-from PyQt5 import QtCore, QtGui, QtWidgets 
+from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtGui import *
-from PyQt5.QtWidgets import QApplication, QDialog, QLabel
+from PyQt5.QtWidgets import QApplication, QDialog, QLabel, QLineEdit
+from PyQt5.Qt import * # 包含了Qt.Key_Return
+
 
 import BookApp as app
+
+searchs = {}
+
+class MyTextEdit(QtWidgets.QTextEdit):
+    
+    def __init__(self, parent, key):
+        """
+        QtWidgets.QTextEdit.__init__(self)
+        self.parent = parent
+        """
+        super(MyTextEdit, self).__init__(parent)
+        # 监听文本框是否被选择
+        #self.selectionChanged.connect(self.text_selected)
+
+        self.key = key
+        if key not in searchs:
+            print('add ' + key + '...')
+            searchs[key] = ""
+
+    def text_selected(self):
+        if self.toPlainText() != '':
+            print(self.toPlainText())
+
+    def keyPressEvent(self, event):
+        """
+        监听文本内容变化，并且过滤回车和空内容
+        """
+        QtWidgets.QTextEdit.keyPressEvent(self, event)
+        if event.key() == Qt.Key_Return:
+            # 过滤回车并且防止空字符的发送
+            cursor = self.textCursor()
+            cursor.clearSelection()
+            cursor.deletePreviousChar()
+            if self.toPlainText() != '':
+                print(self.key+": " + self.toPlainText())
+
+            # update search condition
+            searchs[self.key] = self.toPlainText()
+            print('total search conditions:' + str(searchs))
+
+
+'''
+继承了QLineEdit类，监听文本框内容的变化
+'''
+class MyLineEdit(QtWidgets.QLineEdit):
+
+    def __init__(self, parent):
+        super(MyLineEdit, self).__init__(parent)
+        self.textChanged.connect(self.text_changed)
+        self.editingFinished.connect(self.text_finished)
+
+    def text_changed(self):
+        if self.text() != '':
+            print(self.text())
+
+    def text_finished(self):
+        if self.text() != '':
+            print(self.text())
+
 
 class Ui_Dialog(QDialog):
 
@@ -19,7 +80,7 @@ class Ui_Dialog(QDialog):
 
     def setupUi(self, Dialog):
         Dialog.setObjectName("Dialog")
-        Dialog.resize(652, 437)
+        Dialog.resize(616, 454)
         self.verticalLayout_2 = QtWidgets.QVBoxLayout(Dialog)
         self.verticalLayout_2.setObjectName("verticalLayout_2")
         self.horizontalLayout_3 = QtWidgets.QHBoxLayout()
@@ -69,16 +130,12 @@ class Ui_Dialog(QDialog):
         self.verticalLayout_3 = QtWidgets.QVBoxLayout()
         self.verticalLayout_3.setSpacing(10)
         self.verticalLayout_3.setObjectName("verticalLayout_3")
-        self.txBookName = QtWidgets.QTextEdit(Dialog)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.txBookName.sizePolicy().hasHeightForWidth())
-        self.txBookName.setSizePolicy(sizePolicy)
+        self.txBookName = MyTextEdit(Dialog, 'name')#MyLineEdit(Dialog)#QtWidgets.QLineEdit(Dialog)
+        self.txBookName.setMinimumSize(QtCore.QSize(0, 40))
         self.txBookName.setMaximumSize(QtCore.QSize(16777215, 40))
         self.txBookName.setObjectName("txBookName")
         self.verticalLayout_3.addWidget(self.txBookName)
-        self.txBookJZCode = QtWidgets.QTextEdit(Dialog)
+        self.txBookJZCode = MyTextEdit(Dialog, 'jzcode')#QtWidgets.QTextEdit(Dialog)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -87,7 +144,7 @@ class Ui_Dialog(QDialog):
         self.txBookJZCode.setMaximumSize(QtCore.QSize(16777215, 40))
         self.txBookJZCode.setObjectName("txBookJZCode")
         self.verticalLayout_3.addWidget(self.txBookJZCode)
-        self.txBookBarCode = QtWidgets.QTextEdit(Dialog)
+        self.txBookBarCode = MyTextEdit(Dialog, 'ISBN')#QtWidgets.QTextEdit(Dialog)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -96,7 +153,7 @@ class Ui_Dialog(QDialog):
         self.txBookBarCode.setMaximumSize(QtCore.QSize(16777215, 40))
         self.txBookBarCode.setObjectName("txBookBarCode")
         self.verticalLayout_3.addWidget(self.txBookBarCode)
-        self.txBookAuthor = QtWidgets.QTextEdit(Dialog)
+        self.txBookAuthor = MyTextEdit(Dialog, 'author')#QtWidgets.QTextEdit(Dialog)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -148,46 +205,46 @@ class Ui_Dialog(QDialog):
         self.verticalLayout_6 = QtWidgets.QVBoxLayout()
         self.verticalLayout_6.setSpacing(10)
         self.verticalLayout_6.setObjectName("verticalLayout_6")
-        self.txBookPress_2 = QtWidgets.QTextEdit(Dialog)
+        self.txBookPress = MyTextEdit(Dialog, 'press')#QtWidgets.QTextEdit(Dialog)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.txBookPress_2.sizePolicy().hasHeightForWidth())
-        self.txBookPress_2.setSizePolicy(sizePolicy)
-        self.txBookPress_2.setMinimumSize(QtCore.QSize(0, 40))
-        self.txBookPress_2.setMaximumSize(QtCore.QSize(16777215, 40))
-        self.txBookPress_2.setObjectName("txBookPress_2")
-        self.verticalLayout_6.addWidget(self.txBookPress_2)
-        self.txBookPrice_2 = QtWidgets.QTextEdit(Dialog)
+        sizePolicy.setHeightForWidth(self.txBookPress.sizePolicy().hasHeightForWidth())
+        self.txBookPress.setSizePolicy(sizePolicy)
+        self.txBookPress.setMinimumSize(QtCore.QSize(0, 40))
+        self.txBookPress.setMaximumSize(QtCore.QSize(16777215, 40))
+        self.txBookPress.setObjectName("txBookPress")
+        self.verticalLayout_6.addWidget(self.txBookPress)
+        self.txBookPrice = MyTextEdit(Dialog, 'price')#QtWidgets.QTextEdit(Dialog)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.txBookPrice_2.sizePolicy().hasHeightForWidth())
-        self.txBookPrice_2.setSizePolicy(sizePolicy)
-        self.txBookPrice_2.setMinimumSize(QtCore.QSize(0, 40))
-        self.txBookPrice_2.setMaximumSize(QtCore.QSize(16777215, 40))
-        self.txBookPrice_2.setObjectName("txBookPrice_2")
-        self.verticalLayout_6.addWidget(self.txBookPrice_2)
-        self.txBookNote_2 = QtWidgets.QTextEdit(Dialog)
+        sizePolicy.setHeightForWidth(self.txBookPrice.sizePolicy().hasHeightForWidth())
+        self.txBookPrice.setSizePolicy(sizePolicy)
+        self.txBookPrice.setMinimumSize(QtCore.QSize(0, 40))
+        self.txBookPrice.setMaximumSize(QtCore.QSize(16777215, 40))
+        self.txBookPrice.setObjectName("txBookPrice")
+        self.verticalLayout_6.addWidget(self.txBookPrice)
+        self.txBookNote = MyTextEdit(Dialog, 'note')#QtWidgets.QTextEdit(Dialog)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.txBookNote_2.sizePolicy().hasHeightForWidth())
-        self.txBookNote_2.setSizePolicy(sizePolicy)
-        self.txBookNote_2.setMinimumSize(QtCore.QSize(0, 40))
-        self.txBookNote_2.setMaximumSize(QtCore.QSize(16777215, 40))
-        self.txBookNote_2.setObjectName("txBookNote_2")
-        self.verticalLayout_6.addWidget(self.txBookNote_2)
-        self.t_2 = QtWidgets.QTextEdit(Dialog)
+        sizePolicy.setHeightForWidth(self.txBookNote.sizePolicy().hasHeightForWidth())
+        self.txBookNote.setSizePolicy(sizePolicy)
+        self.txBookNote.setMinimumSize(QtCore.QSize(0, 40))
+        self.txBookNote.setMaximumSize(QtCore.QSize(16777215, 40))
+        self.txBookNote.setObjectName("txBookNote")
+        self.verticalLayout_6.addWidget(self.txBookNote)
+        self.txbookCategory = QtWidgets.QTextEdit(Dialog)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.t_2.sizePolicy().hasHeightForWidth())
-        self.t_2.setSizePolicy(sizePolicy)
-        self.t_2.setMinimumSize(QtCore.QSize(0, 40))
-        self.t_2.setMaximumSize(QtCore.QSize(16777215, 40))
-        self.t_2.setObjectName("t_2")
-        self.verticalLayout_6.addWidget(self.t_2)
+        sizePolicy.setHeightForWidth(self.txbookCategory.sizePolicy().hasHeightForWidth())
+        self.txbookCategory.setSizePolicy(sizePolicy)
+        self.txbookCategory.setMinimumSize(QtCore.QSize(0, 40))
+        self.txbookCategory.setMaximumSize(QtCore.QSize(16777215, 40))
+        self.txbookCategory.setObjectName("txbookCategory")
+        self.verticalLayout_6.addWidget(self.txbookCategory)
         self.horizontalLayout_2.addLayout(self.verticalLayout_6)
         self.horizontalLayout_3.addLayout(self.horizontalLayout_2)
         self.verticalLayout_2.addLayout(self.horizontalLayout_3)
@@ -202,18 +259,18 @@ class Ui_Dialog(QDialog):
         self.verticalLayout_2.addWidget(self.listWidget)
         self.horizontalLayout = QtWidgets.QHBoxLayout()
         self.horizontalLayout.setObjectName("horizontalLayout")
-        self.pushButton = QtWidgets.QPushButton(Dialog)
-        self.pushButton.setObjectName("pushButton")
-        self.horizontalLayout.addWidget(self.pushButton)
-        self.pushButton_2 = QtWidgets.QPushButton(Dialog)
-        self.pushButton_2.setObjectName("pushButton_2")
-        self.horizontalLayout.addWidget(self.pushButton_2)
-        self.pushButton_3 = QtWidgets.QPushButton(Dialog)
-        self.pushButton_3.setObjectName("pushButton_3")
-        self.horizontalLayout.addWidget(self.pushButton_3)
-        self.pushButton_4 = QtWidgets.QPushButton(Dialog)
-        self.pushButton_4.setObjectName("pushButton_4")
-        self.horizontalLayout.addWidget(self.pushButton_4)
+        self.btnAdd = QtWidgets.QPushButton(Dialog)
+        self.btnAdd.setObjectName("btnAdd")
+        self.horizontalLayout.addWidget(self.btnAdd)
+        self.btnUpdate = QtWidgets.QPushButton(Dialog)
+        self.btnUpdate.setObjectName("btnUpdate")
+        self.horizontalLayout.addWidget(self.btnUpdate)
+        self.btnDel = QtWidgets.QPushButton(Dialog)
+        self.btnDel.setObjectName("btnDel")
+        self.horizontalLayout.addWidget(self.btnDel)
+        self.btnQuit = QtWidgets.QPushButton(Dialog)
+        self.btnQuit.setObjectName("btnQuit")
+        self.horizontalLayout.addWidget(self.btnQuit)
         self.verticalLayout_2.addLayout(self.horizontalLayout)
 
         self.retranslateUi(Dialog)
@@ -230,8 +287,8 @@ class Ui_Dialog(QDialog):
         self.label_11.setText(_translate("Dialog", "价格"))
         self.label_12.setText(_translate("Dialog", "备注"))
         self.label_13.setText(_translate("Dialog", "种类"))
-        self.pushButton.setText(_translate("Dialog", "增添"))
-        self.pushButton_2.setText(_translate("Dialog", "修改"))
-        self.pushButton_3.setText(_translate("Dialog", "删除"))
-        self.pushButton_4.setText(_translate("Dialog", "退出"))
+        self.btnAdd.setText(_translate("Dialog", "增添"))
+        self.btnUpdate.setText(_translate("Dialog", "修改"))
+        self.btnDel.setText(_translate("Dialog", "删除"))
+        self.btnQuit.setText(_translate("Dialog", "退出"))
 

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>652</width>
-    <height>437</height>
+    <width>616</width>
+    <height>454</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -107,12 +107,12 @@
           <number>10</number>
          </property>
          <item>
-          <widget class="QTextEdit" name="txBookName">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
+          <widget class="QLineEdit" name="txBookName">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>40</height>
+            </size>
            </property>
            <property name="maximumSize">
             <size>
@@ -241,7 +241,7 @@
           <number>10</number>
          </property>
          <item>
-          <widget class="QTextEdit" name="txBookPress_2">
+          <widget class="QTextEdit" name="txBookPress">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
              <horstretch>0</horstretch>
@@ -263,7 +263,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QTextEdit" name="txBookPrice_2">
+          <widget class="QTextEdit" name="txBookPrice">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
              <horstretch>0</horstretch>
@@ -285,7 +285,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QTextEdit" name="txBookNote_2">
+          <widget class="QTextEdit" name="txBookNote">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
              <horstretch>0</horstretch>
@@ -307,7 +307,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QTextEdit" name="t_2">
+          <widget class="QTextEdit" name="txbookCategory">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
              <horstretch>0</horstretch>
@@ -353,28 +353,28 @@
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
-      <widget class="QPushButton" name="pushButton">
+      <widget class="QPushButton" name="btnAdd">
        <property name="text">
         <string>增添</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="pushButton_2">
+      <widget class="QPushButton" name="btnUpdate">
        <property name="text">
         <string>修改</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="pushButton_3">
+      <widget class="QPushButton" name="btnDel">
        <property name="text">
         <string>删除</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="pushButton_4">
+      <widget class="QPushButton" name="btnQuit">
        <property name="text">
         <string>退出</string>
        </property>
