@@ -22,6 +22,25 @@ Database connect
 '''
 import  pymongo
 
+# 单例模式
+# 使用__new__方法
+class Singleton(object):
+    def __new__(cls, *args, **kwargs):
+        if not hasattr(cls, '_instance'):
+            orig = super(Singleton, cls)
+            cls._instance = orig.__new__(cls, *args, **kwargs)
+        return cls._instance
+
+# 装饰器版本
+def singleton(cls, *args, **kwargs):
+    instances = {}
+    def getinstance():
+        if cls not in instances:
+            instances[cls] = cls(*args, **kwargs)
+        return instances[cls]
+    return getinstance
+
+@singleton
 class DBManager(object):
 
     def __init__(self):
@@ -45,4 +64,8 @@ class DBManager(object):
         pass
 
     def search(self, bookInfo):
-        pass
+        cBook = self.mydb['books']
+        books = cBook.find(bookInfo)
+        #for book in books:
+        #    print(str(book))
+        return books

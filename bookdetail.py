@@ -1,96 +1,17 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'bookinfo2.ui'
+# Form implementation generated from reading ui file 'bookdetail.ui'
 #
 # Created by: PyQt5 UI code generator 5.11.3
 #
 # WARNING! All changes made in this file will be lost!
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtGui import *
-from PyQt5.QtWidgets import QApplication, QDialog, QLabel, QLineEdit
-from PyQt5.Qt import * # 包含了Qt.Key_Return
 
-
-import BookApp as app
-import LYUtils as utils
-
-# 定义全局变量
-class G:
-    searchs = {}
-    gSearch_book_infos = None 
-
-
-class MyTextEdit(QtWidgets.QTextEdit):
-    
-    def __init__(self, parent, key):
-        """
-        QtWidgets.QTextEdit.__init__(self)
-        self.parent = parent
-        """
-        super(MyTextEdit, self).__init__(parent)
-        # 监听文本框是否被选择
-        #self.selectionChanged.connect(self.text_selected)
-
-        self.key = key
-        if key not in G.searchs:
-            print('add ' + key + '...')
-            G.searchs[key] = ""
-
-    def text_selected(self):
-        if self.toPlainText() != '':
-            print(self.toPlainText())
-
-    def keyPressEvent(self, event):
-        """
-        监听文本内容变化，并且过滤回车和空内容
-        """
-        QtWidgets.QTextEdit.keyPressEvent(self, event)
-        if event.key() == Qt.Key_Return:
-            # 过滤回车并且防止空字符的发送
-            cursor = self.textCursor()
-            cursor.clearSelection()
-            cursor.deletePreviousChar()
-            if self.toPlainText() != '':
-                print(self.key+": " + self.toPlainText())
-
-            # update search condition
-            G.searchs[self.key] = self.toPlainText()
-            G.gSearch_book_infos()
-            
-
-
-'''
-继承了QLineEdit类，监听文本框内容的变化
-'''
-class MyLineEdit(QtWidgets.QLineEdit):
-
-    def __init__(self, parent):
-        super(MyLineEdit, self).__init__(parent)
-        self.textChanged.connect(self.text_changed)
-        self.editingFinished.connect(self.text_finished)
-
-    def text_changed(self):
-        if self.text() != '':
-            print(self.text())
-
-    def text_finished(self):
-        if self.text() != '':
-            print(self.text())
-
-
-class Ui_Dialog(QDialog):
-
-    def init_ui(self):
-        print("bookinfo init ui")
-        self.books = []
-
+class Ui_Dialog(object):
     def setupUi(self, Dialog):
-        funcs = {'search_book_info': self.search_book_info}
-        G.gSearch_book_infos = self.search_book_info
-
         Dialog.setObjectName("Dialog")
-        Dialog.resize(649, 536)
+        Dialog.resize(626, 325)
         self.verticalLayout_2 = QtWidgets.QVBoxLayout(Dialog)
         self.verticalLayout_2.setObjectName("verticalLayout_2")
         self.horizontalLayout_3 = QtWidgets.QHBoxLayout()
@@ -140,7 +61,7 @@ class Ui_Dialog(QDialog):
         self.verticalLayout_3 = QtWidgets.QVBoxLayout()
         self.verticalLayout_3.setSpacing(10)
         self.verticalLayout_3.setObjectName("verticalLayout_3")
-        self.txBookName = MyTextEdit(Dialog, 'name')#QtWidgets.QLineEdit(Dialog)
+        self.txBookName = QtWidgets.QLineEdit(Dialog)
         self.txBookName.setMinimumSize(QtCore.QSize(0, 40))
         self.txBookName.setMaximumSize(QtCore.QSize(16777215, 40))
         self.txBookName.setObjectName("txBookName")
@@ -258,32 +179,10 @@ class Ui_Dialog(QDialog):
         self.horizontalLayout_2.addLayout(self.verticalLayout_6)
         self.horizontalLayout_3.addLayout(self.horizontalLayout_2)
         self.verticalLayout_2.addLayout(self.horizontalLayout_3)
-        self.tableWidget = QtWidgets.QTableWidget(Dialog)
-        self.tableWidget.setObjectName("tableWidget")
-
-        self.tableWidget.setColumnCount(8)
-        self.tableWidget.setHorizontalHeaderLabels(
-                ['书籍名称', '作者', '出版社', '价格', 'ISBN', '助记码', '种类', '备注'])
-        self.tableWidget.setRowCount(0)
-        # 设置水平方向表格为自适应的伸缩模式
-        self.tableWidget.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
-        # 禁止修改
-        self.tableWidget.setEditTriggers(QAbstractItemView.NoEditTriggers)
-        # 整行选中的方式
-        self.tableWidget.setSelectionBehavior(QAbstractItemView.SelectRows)
-        # 绑定signal信号事件， 根据类提供的信号事件进行绑定
-        # self.tableWidget.itemClicked.connect(self.selection_item)
-        self.tableWidget.itemDoubleClicked.connect(self.selection_item_double)
-
-        self.verticalLayout_2.addWidget(self.tableWidget)
+        spacerItem = QtWidgets.QSpacerItem(20, 65, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        self.verticalLayout_2.addItem(spacerItem)
         self.horizontalLayout = QtWidgets.QHBoxLayout()
         self.horizontalLayout.setObjectName("horizontalLayout")
-        self.btnAdd = QtWidgets.QPushButton(Dialog)
-        self.btnAdd.setObjectName("btnAdd")
-        self.horizontalLayout.addWidget(self.btnAdd)
-        self.btnUpdate = QtWidgets.QPushButton(Dialog)
-        self.btnUpdate.setObjectName("btnUpdate")
-        self.horizontalLayout.addWidget(self.btnUpdate)
         self.btnDel = QtWidgets.QPushButton(Dialog)
         self.btnDel.setObjectName("btnDel")
         self.horizontalLayout.addWidget(self.btnDel)
@@ -295,10 +194,9 @@ class Ui_Dialog(QDialog):
         self.retranslateUi(Dialog)
         QtCore.QMetaObject.connectSlotsByName(Dialog)
 
-
     def retranslateUi(self, Dialog):
         _translate = QtCore.QCoreApplication.translate
-        Dialog.setWindowTitle(_translate("Dialog", "图书信息"))
+        Dialog.setWindowTitle(_translate("Dialog", "Dialog"))
         self.label.setText(_translate("Dialog", "书籍名称"))
         self.label_3.setText(_translate("Dialog", "助记码"))
         self.label_4.setText(_translate("Dialog", "条形码"))
@@ -307,81 +205,6 @@ class Ui_Dialog(QDialog):
         self.label_11.setText(_translate("Dialog", "价格"))
         self.label_12.setText(_translate("Dialog", "备注"))
         self.label_13.setText(_translate("Dialog", "种类"))
-        self.btnAdd.setText(_translate("Dialog", "增添"))
-        self.btnUpdate.setText(_translate("Dialog", "修改"))
         self.btnDel.setText(_translate("Dialog", "删除"))
-        self.btnQuit.setText(_translate("Dialog", "退出"))
+        self.btnQuit.setText(_translate("Dialog", "返回"))
 
-    def search_book_info(self):
-        #print('total search conditions:' + str(G.searchs))
-        bookInfo = {}
-        for (k, v) in G.searchs.items():
-            if G.searchs[k] != '':
-                # 模糊查找
-                bookInfo[k] = {"$regex":v, "$options":'$i'}
-
-        self.books = list(utils.DBManager().search(bookInfo))
-        rowCnt = 0
-        
-        """
-        self.tableWidget.setRowCount(rowCnt+1)
-        itemName = QtWidgets.QTableWidgetItem(books[0]['name'])
-        itemName.setBackground(QColor(100,100,200))
-        self.tableWidget.setItem(rowCnt, 0, itemName)
-        """
-
-        name = ""
-        for abook in self.books: 
-            self.tableWidget.setRowCount(rowCnt+1)
-            name = abook['name']
-            itemName = QtWidgets.QTableWidgetItem(abook['name'])
-            self.tableWidget.setItem(rowCnt, 0, itemName)
-        
-            
-            itemAuthor = QtWidgets.QTableWidgetItem(abook['author'])
-            self.tableWidget.setItem(rowCnt, 1, itemAuthor)
-        
-            newItem = QtWidgets.QTableWidgetItem(abook['press'])
-            self.tableWidget.setItem(rowCnt, 2, newItem)
-        
-            newItem = QtWidgets.QTableWidgetItem(abook['price'])
-            self.tableWidget.setItem(rowCnt, 3, newItem)
-        
-            newItem = QtWidgets.QTableWidgetItem(abook['ISBN'])
-            self.tableWidget.setItem(rowCnt, 4, newItem)
-        
-            newItem = QtWidgets.QTableWidgetItem(abook['jzc'])
-            self.tableWidget.setItem(rowCnt, 5, newItem)
-                
-            newItem = QtWidgets.QTableWidgetItem(abook['category'])
-            self.tableWidget.setItem(rowCnt, 6, newItem)
-        
-            newItem = QtWidgets.QTableWidgetItem(abook['notes'])
-            self.tableWidget.setItem(rowCnt, 7, newItem)
-            
-            # 设置任务操作 添加多个按钮
-            """
-            checkBtn = QtWidgets.QPushButton('修改')
-            checkBtn.clicked.connect(lambda:self.update_book_info(abook, name, checkBtn))
-            delBtn  = QtWidgets.QPushButton('删除')
-            delBtn.clicked.connect(lambda:self.delete_book_info(abook, name))
-        
-            hLayout = QtWidgets.QHBoxLayout()
-            hLayout.addWidget(checkBtn)
-            hLayout.addWidget(delBtn)
-            hLayout.setContentsMargins(0,0,0,0)
-            hLayout.setAlignment(Qt.AlignCenter)
-            widget = QtWidgets.QWidget()
-            widget.setLayout(hLayout)
-            self.tableWidget.setCellWidget(rowCnt, 0, checkBtn)
-            """
-
-            rowCnt+=1
-                   
-    def selection_item_double(self):
-        '''
-        双击表单的数据项
-        '''
-        print(self.tableWidget.currentRow())
-        index = self.tableWidget.currentRow()
-        print((self.books[index]))

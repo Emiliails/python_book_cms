@@ -5,8 +5,10 @@ import sys
 from login import Ui_MainWindow as wLogin
 # 主功能界面
 from mainmenu import Ui_Dialog as mainMenuDialog
-# 图书信息界面
+# 图书搜索界面
 from bookinfo import Ui_Dialog as bookInfoDialog 
+# 图书详情界面，可以修改删除
+from bookdetail import Ui_Dialog as bookDetailDialog
 
 import BookApp 
 
