@@ -5,16 +5,54 @@ LYUtils.py
 '''
 快速排序
 '''
-def partition(seq):
-    pi, seq = seq[0], seq[1:]
-    lo = [x for x in seq if x <= pi]
-    hi = [x for x in seq if x > pi]
-    return lo, pi, hi
+# enum.Enum 枚举类型
+from collections import namedtuple
+from enum import Enum
 
-def quick_sort(seq):
-    if len(seq) <= 1: return seq
-    lo, pi, hi = partition(seq)
-    return quick_sort(lo) + pi + quick_sort(hi)
+class Sort(Enum):
+    ASC  = 1    # 升序
+    DESC = 2    # 降序
+
+# 快速排序
+def swap(L, a, b):
+    tmp = L[a]
+    L[a]= L[b]
+    L[b] = tmp
+
+def qSrot(L, key, low, high):
+    
+    if low >= high:
+        return
+    
+    tmp = L[low];
+    left = low
+    right = high
+    
+    
+    while left < right:
+        while right > left and L[right][key] >= tmp[key]:
+            right -= 1
+        while left < right and L[left][key] <= tmp[key]:
+            left += 1
+
+        if left < right:
+            swap(L, left, right)
+    
+         
+    if low != left:
+        swap(L, left, low)
+            
+    qSrot(L, key, low, left-1)
+    qSrot(L, key, left+1, high)
+    
+    
+        
+def quick_sort(L, key, sort=Sort.ASC):
+    lenList = len(L) - 1
+    qSrot(L, key ,0 ,lenList)
+    
+    if sort == Sort.DESC:
+        L.reverse()
 
 
 '''

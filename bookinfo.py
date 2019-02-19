@@ -84,6 +84,8 @@ class Ui_Dialog(QDialog):
     def init_ui(self):
         print("bookinfo init ui")
         self.books = []
+        self.bookSort = [0,0,0,0,0,0,0,0]
+        self.rowCnt = 0
 
     def setupUi(self, Dialog):
         funcs = {'search_book_info': self.search_book_info}
@@ -274,6 +276,10 @@ class Ui_Dialog(QDialog):
         # 绑定signal信号事件， 根据类提供的信号事件进行绑定
         # self.tableWidget.itemClicked.connect(self.selection_item)
         self.tableWidget.itemDoubleClicked.connect(self.selection_item_double)
+        # 表头的排序功能，默认是升序
+        self.tableWidget.horizontalHeader().setSortIndicator(0, Qt.AscendingOrder)
+        self.tableWidget.horizontalHeader().setSortIndicatorShown(True)
+        self.tableWidget.horizontalHeader().sectionClicked.connect(self.hor_sort_clicked)
 
         self.verticalLayout_2.addWidget(self.tableWidget)
         self.horizontalLayout = QtWidgets.QHBoxLayout()
@@ -321,43 +327,73 @@ class Ui_Dialog(QDialog):
                 bookInfo[k] = {"$regex":v, "$options":'$i'}
 
         self.books = list(utils.DBManager().search(bookInfo))
-        rowCnt = 0
         
         """
-        self.tableWidget.setRowCount(rowCnt+1)
+        self.tableWidget.setRowCount(self.rowCnt+1)
         itemName = QtWidgets.QTableWidgetItem(books[0]['name'])
         itemName.setBackground(QColor(100,100,200))
-        self.tableWidget.setItem(rowCnt, 0, itemName)
+        self.tableWidget.setItem(self.rowCnt, 0, itemName)
         """
-
-        name = ""
-        for abook in self.books: 
-            self.tableWidget.setRowCount(rowCnt+1)
-            name = abook['name']
-            itemName = QtWidgets.QTableWidgetItem(abook['name'])
-            self.tableWidget.setItem(rowCnt, 0, itemName)
         
-            
+        self.refresh_book_list()
+
+    def selection_item_double(self):
+        '''
+        双击表单的数据项
+        '''
+        print(self.tableWidget.currentRow())
+        index = self.tableWidget.currentRow()
+        print((self.books[index]))
+
+    def hor_sort_clicked(self, index):
+        print("index{0}:".format(index))
+        print("len:{0}".format(len(self.bookSort)))
+
+        keyName = ''
+        if index == 0:
+            keyName = 'name'
+        elif index == 3:
+            keyName = 'price'
+   
+        if self.bookSort[index] == utils.Sort.DESC: 
+            self.bookSort[index] = utils.Sort.ASC 
+        else: 
+            self.bookSort[index] = utils.Sort.DESC
+
+        utils.quick_sort(self.books, key=keyName, sort=self.bookSort[index])
+        self.refresh_book_list()
+
+
+                       
+    def refresh_book_list(self):
+        self.tableWidget.clear()
+        self.rowCnt = 0
+
+        for abook in self.books: 
+            self.tableWidget.setRowCount(self.rowCnt+1)
+            itemName = QtWidgets.QTableWidgetItem(abook['name'])
+            self.tableWidget.setItem(self.rowCnt, 0, itemName)
+        
             itemAuthor = QtWidgets.QTableWidgetItem(abook['author'])
-            self.tableWidget.setItem(rowCnt, 1, itemAuthor)
+            self.tableWidget.setItem(self.rowCnt, 1, itemAuthor)
         
             newItem = QtWidgets.QTableWidgetItem(abook['press'])
-            self.tableWidget.setItem(rowCnt, 2, newItem)
-        
-            newItem = QtWidgets.QTableWidgetItem(abook['price'])
-            self.tableWidget.setItem(rowCnt, 3, newItem)
+            self.tableWidget.setItem(self.rowCnt, 2, newItem)
+
+            newItem = QtWidgets.QTableWidgetItem(str(abook['price']))
+            self.tableWidget.setItem(self.rowCnt, 3, newItem)
         
             newItem = QtWidgets.QTableWidgetItem(abook['ISBN'])
-            self.tableWidget.setItem(rowCnt, 4, newItem)
+            self.tableWidget.setItem(self.rowCnt, 4, newItem)
         
             newItem = QtWidgets.QTableWidgetItem(abook['jzc'])
-            self.tableWidget.setItem(rowCnt, 5, newItem)
+            self.tableWidget.setItem(self.rowCnt, 5, newItem)
                 
             newItem = QtWidgets.QTableWidgetItem(abook['category'])
-            self.tableWidget.setItem(rowCnt, 6, newItem)
+            self.tableWidget.setItem(self.rowCnt, 6, newItem)
         
             newItem = QtWidgets.QTableWidgetItem(abook['notes'])
-            self.tableWidget.setItem(rowCnt, 7, newItem)
+            self.tableWidget.setItem(self.rowCnt, 7, newItem)
             
             # 设置任务操作 添加多个按钮
             """
@@ -373,15 +409,8 @@ class Ui_Dialog(QDialog):
             hLayout.setAlignment(Qt.AlignCenter)
             widget = QtWidgets.QWidget()
             widget.setLayout(hLayout)
-            self.tableWidget.setCellWidget(rowCnt, 0, checkBtn)
+            self.tableWidget.setCellWidget(self.rowCnt, 0, checkBtn)
             """
+            self.rowCnt+=1
 
-            rowCnt+=1
-                   
-    def selection_item_double(self):
-        '''
-        双击表单的数据项
-        '''
-        print(self.tableWidget.currentRow())
-        index = self.tableWidget.currentRow()
-        print((self.books[index]))
+   
