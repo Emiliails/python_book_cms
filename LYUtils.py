@@ -1,6 +1,8 @@
 '''
 LYUtils.py
 '''
+class G:
+    debug = True
 
 '''
 快速排序
@@ -95,6 +97,14 @@ class DBManager(object):
         print('illege user!')
         return False
 
+    def get_category(self):
+        '''
+        获取图书种类(category)的数据
+        '''
+        cCategory = self.mydb['category']
+        categories = cCategory.find()
+        return categories
+
     def insert(self, bookInfo):
         pass
 
@@ -104,6 +114,26 @@ class DBManager(object):
     def search(self, bookInfo):
         cBook = self.mydb['books']
         books = cBook.find(bookInfo)
-        #for book in books:
-        #    print(str(book))
         return books
+
+    def update_book_detail(self, bookInfo): 
+        print("update bookinfo:{0}".format(bookInfo))
+        cBook = self.mydb['books']
+        # update 
+        myQuery = {'_id':bookInfo['_id']}
+        newVal = {'$set':{'name':bookInfo['name'],
+                    'ISBN':bookInfo['ISBN'],
+                    'jzc':bookInfo['jzc'],
+                    'author':bookInfo['author'],
+                    'notes':bookInfo['notes'],
+                    'press':bookInfo['press'],
+                    'price':bookInfo['price']}}
+
+        cBook.update_one(myQuery, newVal)
+
+    
+
+
+
+
+

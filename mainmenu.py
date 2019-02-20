@@ -104,8 +104,10 @@ class Ui_Dialog(QDialog):
         dialog = app.get_window('bookinfo')
 
         dialog.setModal(True)        
-        #dialog.init_ui_action()
+        dialog.init_ui_action()
         dialog.show()
+
+        app.hide_window('mainmenu')
 
 
     def show_book_add_window(self):
@@ -119,4 +121,5 @@ class Ui_Dialog(QDialog):
 
     def show_book_exit_window(self):
         print("show_book_exit_window")
+
 

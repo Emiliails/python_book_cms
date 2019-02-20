@@ -10,7 +10,19 @@ from bookinfo import Ui_Dialog as bookInfoDialog
 # 图书详情界面，可以修改删除
 from bookdetail import Ui_Dialog as bookDetailDialog
 
-import BookApp 
+import BookApp
+
+"""
+from ctypes import *
+adder = CDLL('./clib/adder.so')
+res_int = adder.add_int(4,5)
+print('ret:{0}'.format(res_int))
+a = c_float(5.5)
+b = c_float(4.1)
+add_float = adder.add_float
+add_float.restype = c_float
+print(add_float(a, b))
+"""
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)  # 创建一个QApplication，也就是你要开发的软件app
@@ -23,13 +35,16 @@ if __name__ == "__main__":
     
     # 初始化图书信息界面
     bookInfo = bookInfoDialog()
-    bookInfo.init_ui()
-    bookInfo.setupUi(bookInfo)
+    bookInfo.init_ui(bookInfo)
+
+    bookDetail = bookDetailDialog()
+    bookDetail.init_ui(bookDetail)
 
     # 添加所有界面容器uis中
     BookApp.uis['mainmenu'] = mainMenu
     BookApp.uis['login'] = mainWindow
     BookApp.uis['bookinfo'] = bookInfo
+    BookApp.uis['bookdetail'] = bookDetail
 
     sys.exit(app.exec_())                   # 使用exit()或者点击关闭按钮退出QApplication
 

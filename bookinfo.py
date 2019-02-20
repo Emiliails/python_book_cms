@@ -15,81 +15,56 @@ from PyQt5.Qt import * # 包含了Qt.Key_Return
 import BookApp as app
 import LYUtils as utils
 
-# 定义全局变量
-class G:
-    searchs = {}
-    gSearch_book_infos = None 
-
-
-class MyTextEdit(QtWidgets.QTextEdit):
-    
-    def __init__(self, parent, key):
-        """
-        QtWidgets.QTextEdit.__init__(self)
-        self.parent = parent
-        """
-        super(MyTextEdit, self).__init__(parent)
-        # 监听文本框是否被选择
-        #self.selectionChanged.connect(self.text_selected)
-
-        self.key = key
-        if key not in G.searchs:
-            print('add ' + key + '...')
-            G.searchs[key] = ""
-
-    def text_selected(self):
-        if self.toPlainText() != '':
-            print(self.toPlainText())
-
-    def keyPressEvent(self, event):
-        """
-        监听文本内容变化，并且过滤回车和空内容
-        """
-        QtWidgets.QTextEdit.keyPressEvent(self, event)
-        if event.key() == Qt.Key_Return:
-            # 过滤回车并且防止空字符的发送
-            cursor = self.textCursor()
-            cursor.clearSelection()
-            cursor.deletePreviousChar()
-            if self.toPlainText() != '':
-                print(self.key+": " + self.toPlainText())
-
-            # update search condition
-            G.searchs[self.key] = self.toPlainText()
-            G.gSearch_book_infos()
-            
-
-
-'''
-继承了QLineEdit类，监听文本框内容的变化
-'''
-class MyLineEdit(QtWidgets.QLineEdit):
-
-    def __init__(self, parent):
-        super(MyLineEdit, self).__init__(parent)
-        self.textChanged.connect(self.text_changed)
-        self.editingFinished.connect(self.text_finished)
-
-    def text_changed(self):
-        if self.text() != '':
-            print(self.text())
-
-    def text_finished(self):
-        if self.text() != '':
-            print(self.text())
-
-
 class Ui_Dialog(QDialog):
 
-    def init_ui(self):
+    def init_ui(self, bookInfo):
         print("bookinfo init ui")
         self.books = []
         self.bookSort = [0,0,0,0,0,0,0,0]
         self.rowCnt = 0
 
+        self.setupUi(bookInfo)
+        self.init_ui_data()
+
+        self.tableWidget.setColumnCount(8)
+        self.tableWidget.setHorizontalHeaderLabels(
+                ['书籍名称', '作者', '出版社', '价格', 'ISBN', '助记码', '种类', '备注'])
+        self.tableWidget.setRowCount(0)
+        
+        # 设置水平方向表格为自适应的伸缩模式
+        self.tableWidget.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        # 禁止修改
+        self.tableWidget.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        # 整行选中的方式
+        self.tableWidget.setSelectionBehavior(QAbstractItemView.SelectRows)
+        # 绑定signal信号事件， 根据类提供的信号事件进行绑定
+        # self.tableWidget.itemClicked.connect(self.selection_item)
+        self.tableWidget.itemDoubleClicked.connect(self.selection_item_double)
+        # 表头的排序功能，默认是升序
+        self.tableWidget.horizontalHeader().setSortIndicator(0, Qt.AscendingOrder)
+        self.tableWidget.horizontalHeader().setSortIndicatorShown(True)
+        self.tableWidget.horizontalHeader().sectionClicked.connect(self.hor_sort_clicked)
+
+    def init_ui_action(self):
+        self.btnQuit.clicked.connect(self.exit_book_info)
+
+        
+    def init_ui_data(self):
+        # 查询数据中图书种类category信息
+        categories = list(utils.DBManager().get_category())
+    
+        categories.insert(0, {'name':''})
+        for category in categories:
+            print("{0}".format(category))
+            self.txBookCategory.addItem(category['name'])
+
+        self.txBookCategory.activated.connect(self.selection_book_category)
+        self.txBookCategory.currentTextChanged.connect(self.selection_book_category_txt)
+
+
     def setupUi(self, Dialog):
         funcs = {'search_book_info': self.search_book_info}
-        G.gSearch_book_infos = self.search_book_info
+        app.gSearch_book_infos = self.search_book_info
 
         Dialog.setObjectName("Dialog")
         Dialog.resize(649, 536)
@@ -142,7 +117,7 @@ class Ui_Dialog(QDialog):
         self.verticalLayout_3 = QtWidgets.QVBoxLayout()
         self.verticalLayout_3.setSpacing(10)
         self.verticalLayout_3.setObjectName("verticalLayout_3")
-        self.txBookName = MyTextEdit(Dialog, 'name')#QtWidgets.QLineEdit(Dialog)
+        self.txBookName = app.MyTextEdit(Dialog, 'name')
         self.txBookName.setMinimumSize(QtCore.QSize(0, 40))
         self.txBookName.setMaximumSize(QtCore.QSize(16777215, 40))
         self.txBookName.setObjectName("txBookName")
@@ -247,39 +222,17 @@ class Ui_Dialog(QDialog):
         self.txBookNote.setMaximumSize(QtCore.QSize(16777215, 40))
         self.txBookNote.setObjectName("txBookNote")
         self.verticalLayout_6.addWidget(self.txBookNote)
-        self.txbookCategory = QtWidgets.QTextEdit(Dialog)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.txbookCategory.sizePolicy().hasHeightForWidth())
-        self.txbookCategory.setSizePolicy(sizePolicy)
-        self.txbookCategory.setMinimumSize(QtCore.QSize(0, 40))
-        self.txbookCategory.setMaximumSize(QtCore.QSize(16777215, 40))
-        self.txbookCategory.setObjectName("txbookCategory")
-        self.verticalLayout_6.addWidget(self.txbookCategory)
+        self.txBookCategory = QtWidgets.QComboBox(Dialog)
+        self.txBookCategory.setMinimumSize(QtCore.QSize(0, 40))
+        self.txBookCategory.setMaximumSize(QtCore.QSize(16777215, 40))
+        self.txBookCategory.setObjectName("txBookCategory")
+        self.verticalLayout_6.addWidget(self.txBookCategory)
         self.horizontalLayout_2.addLayout(self.verticalLayout_6)
         self.horizontalLayout_3.addLayout(self.horizontalLayout_2)
         self.verticalLayout_2.addLayout(self.horizontalLayout_3)
+       
         self.tableWidget = QtWidgets.QTableWidget(Dialog)
         self.tableWidget.setObjectName("tableWidget")
-
-        self.tableWidget.setColumnCount(8)
-        self.tableWidget.setHorizontalHeaderLabels(
-                ['书籍名称', '作者', '出版社', '价格', 'ISBN', '助记码', '种类', '备注'])
-        self.tableWidget.setRowCount(0)
-        # 设置水平方向表格为自适应的伸缩模式
-        self.tableWidget.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
-        # 禁止修改
-        self.tableWidget.setEditTriggers(QAbstractItemView.NoEditTriggers)
-        # 整行选中的方式
-        self.tableWidget.setSelectionBehavior(QAbstractItemView.SelectRows)
-        # 绑定signal信号事件， 根据类提供的信号事件进行绑定
-        # self.tableWidget.itemClicked.connect(self.selection_item)
-        self.tableWidget.itemDoubleClicked.connect(self.selection_item_double)
-        # 表头的排序功能，默认是升序
-        self.tableWidget.horizontalHeader().setSortIndicator(0, Qt.AscendingOrder)
-        self.tableWidget.horizontalHeader().setSortIndicatorShown(True)
-        self.tableWidget.horizontalHeader().sectionClicked.connect(self.hor_sort_clicked)
 
         self.verticalLayout_2.addWidget(self.tableWidget)
         self.horizontalLayout = QtWidgets.QHBoxLayout()
@@ -301,7 +254,6 @@ class Ui_Dialog(QDialog):
         self.retranslateUi(Dialog)
         QtCore.QMetaObject.connectSlotsByName(Dialog)
 
-
     def retranslateUi(self, Dialog):
         _translate = QtCore.QCoreApplication.translate
         Dialog.setWindowTitle(_translate("Dialog", "图书信息"))
@@ -318,16 +270,35 @@ class Ui_Dialog(QDialog):
         self.btnDel.setText(_translate("Dialog", "删除"))
         self.btnQuit.setText(_translate("Dialog", "退出"))
 
+    def exit_book_info(self):
+        app.hide_window('bookinfo')
+        app.show_window('mainmenu')
+
+    def get_books_list(self):
+        bookInfo = {}
+        for (k, v) in app.searchs.items():
+            if app.searchs[k] != '':
+                # 模糊查找
+                bookInfo[k] = {"$regex":v, "$options":'$i'}
+
+        print('total search conditions:' + str(bookInfo))
+        books = list(utils.DBManager().search(bookInfo))
+        print("{0}".format(books))
+        return books
+
+
     def search_book_info(self):
+        """
         #print('total search conditions:' + str(G.searchs))
         bookInfo = {}
-        for (k, v) in G.searchs.items():
-            if G.searchs[k] != '':
+        for (k, v) in app.searchs.items():
+            if app.searchs[k] != '':
                 # 模糊查找
                 bookInfo[k] = {"$regex":v, "$options":'$i'}
 
         self.books = list(utils.DBManager().search(bookInfo))
-        
+        """
+        self.books = self.get_books_list()
         """
         self.tableWidget.setRowCount(self.rowCnt+1)
         itemName = QtWidgets.QTableWidgetItem(books[0]['name'])
@@ -344,6 +315,26 @@ class Ui_Dialog(QDialog):
         print(self.tableWidget.currentRow())
         index = self.tableWidget.currentRow()
         print((self.books[index]))
+
+        dialog = app.get_window('bookdetail')
+        dialog.setModal(True)        
+        #dialog.setupUi(dialog)
+        #dialog.init_ui_action()
+        dialog.init_ui_data(self.books[index])
+        dialog.init_ui_action()
+
+        dialog.show()
+        app.hide_window('bookinfo')
+
+    def selection_book_category(self, index):
+        print(index)
+
+    def selection_book_category_txt(self, txt):
+        app.searchs['category'] = txt
+        self.books = self.get_books_list()
+        self.refresh_book_list()
+            
+
 
     def hor_sort_clicked(self, index):
         print("index{0}:".format(index))
@@ -368,6 +359,9 @@ class Ui_Dialog(QDialog):
     def refresh_book_list(self):
         self.tableWidget.clear()
         self.rowCnt = 0
+        self.tableWidget.setRowCount(self.rowCnt)
+        self.tableWidget.setHorizontalHeaderLabels(
+                ['书籍名称', '作者', '出版社', '价格', 'ISBN', '助记码', '种类', '备注'])
 
         for abook in self.books: 
             self.tableWidget.setRowCount(self.rowCnt+1)
@@ -411,6 +405,5 @@ class Ui_Dialog(QDialog):
             widget.setLayout(hLayout)
             self.tableWidget.setCellWidget(self.rowCnt, 0, checkBtn)
             """
-            self.rowCnt+=1
+            self.rowCnt+=1 
 
-   
