@@ -47,8 +47,8 @@ class Ui_Dialog(QDialog):
 
     def init_ui_action(self):
         self.btnQuit.clicked.connect(self.exit_book_info)
+        self.btnAdd.clicked.connect(self.go_to_book_add)
 
-        
     def init_ui_data(self):
         # 查询数据中图书种类category信息
         categories = list(utils.DBManager().get_category())
@@ -274,6 +274,19 @@ class Ui_Dialog(QDialog):
         app.hide_window('bookinfo')
         app.show_window('mainmenu')
 
+    def go_to_book_add(self):
+        '''
+        进入添加图书信息界面
+        '''
+        dialog = app.get_window('bookadd')
+        dialog.init_ui_action()
+        dialog.init_ui_data()
+        dialog.show()
+
+        app.show_window('bookadd')
+        app.hide_window('bookinfo')
+
+
     def get_books_list(self):
         bookInfo = {}
         for (k, v) in app.searchs.items():
@@ -329,12 +342,12 @@ class Ui_Dialog(QDialog):
     def selection_book_category(self, index):
         print(index)
 
+
     def selection_book_category_txt(self, txt):
         app.searchs['category'] = txt
         self.books = self.get_books_list()
         self.refresh_book_list()
             
-
 
     def hor_sort_clicked(self, index):
         print("index{0}:".format(index))
@@ -355,7 +368,6 @@ class Ui_Dialog(QDialog):
         self.refresh_book_list()
 
 
-                       
     def refresh_book_list(self):
         self.tableWidget.clear()
         self.rowCnt = 0

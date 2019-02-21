@@ -10,6 +10,8 @@ from bookinfo import Ui_Dialog as bookInfoDialog
 # 图书详情界面，可以修改删除
 from bookdetail import Ui_Dialog as bookDetailDialog
 
+from addbookdetail import Ui_Dialog as bookAddDialog
+
 import BookApp
 
 """
@@ -40,11 +42,15 @@ if __name__ == "__main__":
     bookDetail = bookDetailDialog()
     bookDetail.init_ui(bookDetail)
 
+    bookAdd = bookAddDialog()
+    bookAdd.init_ui(bookAdd)
+
     # 添加所有界面容器uis中
     BookApp.uis['mainmenu'] = mainMenu
     BookApp.uis['login'] = mainWindow
     BookApp.uis['bookinfo'] = bookInfo
     BookApp.uis['bookdetail'] = bookDetail
+    BookApp.uis['bookadd'] = bookAdd
 
     sys.exit(app.exec_())                   # 使用exit()或者点击关闭按钮退出QApplication
 

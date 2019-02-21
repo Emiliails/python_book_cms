@@ -56,10 +56,38 @@ def quick_sort(L, key, sort=Sort.ASC):
     if sort == Sort.DESC:
         L.reverse()
 
+ 
+import hashlib
+def get_dic_md5(dic):
+    allItems = str(dic)
+    m2 = hashlib.md5(allItems.encode(encoding='UTF-8')).hexdigest()
+    return m2
 
-'''
+def is_same_dic(dict1, dict2):
+    '''
+    判断两个字典的值是否相同
+    Keyword arguments:
+    dict1 -- 字典1
+    dict2 -- 字典2
+    Returns: bool
+    '''
+    if len(dict1.items()) != len(dict2.items()):
+        return False
+    
+    length = len(dict1.items())
+    for k, v in dict1.items():
+        if k in dict2.keys():
+            if dict2[k] != v: 
+                return False
+        else:
+            return False
+
+    return True
+
+
+"""
 Database connect
-'''
+"""
 import  pymongo
 
 # 单例模式
@@ -105,10 +133,16 @@ class DBManager(object):
         categories = cCategory.find()
         return categories
 
-    def insert(self, bookInfo):
+    def insert_book_detail(self, bookInfo):
+        cBook = self.mydb['books']
+        cBook.insert_one(bookInfo)
         pass
 
-    def delete(self, bookInfo):
+    def delete_book(self, bookInfo):
+        cBook = self.mydb['books']
+        # update 
+        myQuery = {'_id':bookInfo['_id']}
+        cBook.delete_one(myQuery)
         pass
 
     def search(self, bookInfo):
@@ -117,7 +151,6 @@ class DBManager(object):
         return books
 
     def update_book_detail(self, bookInfo): 
-        print("update bookinfo:{0}".format(bookInfo))
         cBook = self.mydb['books']
         # update 
         myQuery = {'_id':bookInfo['_id']}

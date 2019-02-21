@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'bookdetail2.ui'
+# Form implementation generated from reading ui file 'addbookdetail.ui'
 #
 # Created by: PyQt5 UI code generator 5.11.3
 #
@@ -13,52 +13,53 @@ from PyQt5.QtWidgets import QApplication, QDialog, QLabel, QLineEdit, QMessageBo
 import BookApp as app
 import LYUtils as utils
 
+"""
+新增一个关闭窗口类
+"""
+class Ui_Quit_Dialog(QDialog):
+
+    def show_quit_dialog(self, dialog):
+        box = QMessageBox(QMessageBox.Question, self.tr("提示"), self.tr("请填写完整图书信息！"), QMessageBox.NoButton, self)
+        yr_btn = box.addButton(self.tr("是"), QMessageBox.YesRole)
+
+        box.move(dialog.pos().x()+dialog.size().width()/2-box.size().width(),
+                dialog.pos().y() + dialog.size().height()/2-box.size().height())
+
+        box.exec_()
+        if box.clickedButton() == yr_btn:
+            #self.closeFromAction = True
+            print ('Bye bye...')
+            return
+
+
 class Ui_Dialog(QDialog):
 
     def init_ui(self, bookDetail):
         QDialog.__init__(self)
         print("bookdetail init ui")
         self.setupUi(bookDetail)
-        self.bookInfoUpdate = {}
-        self.oldBookInfo = {}
+        self.bookInfoAdd = {}
         self.closeFromAction = False
-
+    
     def init_ui_action(self):
-        self.btnQuit.clicked.connect(self.quit_book_detail)
-        self.btnUpdate.clicked.connect(
-                self.update_book_detail_alert)
-        self.btnDel.clicked.connect(self.del_book_detail)
-
-    def init_ui_data(self, bookDetailInfo):
+        self.btnQuit.clicked.connect(self.quit_book_add)
+        self.btnAdd.clicked.connect(
+                self.add_db_book_detail)
+        
+    def init_ui_data(self):
         self.closeFromAction = False
-        # 保存原来图书信息，以防图书信息被改变 
-        self.oldBookInfo = bookDetailInfo
-        self.txBookName.setText(bookDetailInfo['name'])
-        self.txBookJZCode.setText(bookDetailInfo['jzc'])
-        self.txBookBarCode.setText(bookDetailInfo['ISBN'])
-        self.txBookAuthor.setText(bookDetailInfo['author'])
-        self.txBookPress.setText(bookDetailInfo['press'])
-        self.txBookPrice.setText(str(bookDetailInfo['price']))
-        self.txBookNote.setText(bookDetailInfo['notes'])
-
         # 查询数据中图书种类category信息
         categories = list(utils.DBManager().get_category())
-    
-        bookInfoCategory = bookDetailInfo['category']
         categories.insert(0, {'name':''})
         self.txBookCategory.clear() # 清空所有items
         for category in categories:
             self.txBookCategory.addItem(category['name'])
-            # 判断图书的默认种类category值
-            if category['name'] == bookInfoCategory:
-                self.txBookCategory.setCurrentText(category['name'])
 
-        self.txBookCategory.activated.connect(self.selection_book_category)
         self.txBookCategory.currentTextChanged.connect(self.selection_book_category_txt)
-    
+
     def setupUi(self, Dialog):
         Dialog.setObjectName("Dialog")
-        Dialog.resize(518, 300)
+        Dialog.resize(539, 309)
         self.verticalLayout_2 = QtWidgets.QVBoxLayout(Dialog)
         self.verticalLayout_2.setObjectName("verticalLayout_2")
         self.horizontalLayout_3 = QtWidgets.QHBoxLayout()
@@ -221,32 +222,24 @@ class Ui_Dialog(QDialog):
         self.horizontalLayout_2.addLayout(self.verticalLayout_6)
         self.horizontalLayout_3.addLayout(self.horizontalLayout_2)
         self.verticalLayout_2.addLayout(self.horizontalLayout_3)
-        spacerItem = QtWidgets.QSpacerItem(20, 38, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        spacerItem = QtWidgets.QSpacerItem(20, 49, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
         self.verticalLayout_2.addItem(spacerItem)
-        self.horizontalLayout_5 = QtWidgets.QHBoxLayout()
-        self.horizontalLayout_5.setObjectName("horizontalLayout_5")
         self.horizontalLayout = QtWidgets.QHBoxLayout()
         self.horizontalLayout.setObjectName("horizontalLayout")
-        self.btnUpdate = QtWidgets.QPushButton(Dialog)
-        self.btnUpdate.setObjectName("btnUpdate")
-        self.horizontalLayout.addWidget(self.btnUpdate)
-        self.btnDel = QtWidgets.QPushButton(Dialog)
-        self.btnDel.setObjectName("btnDel")
-        self.horizontalLayout.addWidget(self.btnDel)
-        self.horizontalLayout_5.addLayout(self.horizontalLayout)
-        spacerItem1 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.horizontalLayout_5.addItem(spacerItem1)
+        self.btnAdd = QtWidgets.QPushButton(Dialog)
+        self.btnAdd.setObjectName("btnAdd")
+        self.horizontalLayout.addWidget(self.btnAdd)
         self.btnQuit = QtWidgets.QPushButton(Dialog)
         self.btnQuit.setObjectName("btnQuit")
-        self.horizontalLayout_5.addWidget(self.btnQuit)
-        self.verticalLayout_2.addLayout(self.horizontalLayout_5)
+        self.horizontalLayout.addWidget(self.btnQuit)
+        self.verticalLayout_2.addLayout(self.horizontalLayout)
 
         self.retranslateUi(Dialog)
         QtCore.QMetaObject.connectSlotsByName(Dialog)
 
     def retranslateUi(self, Dialog):
         _translate = QtCore.QCoreApplication.translate
-        Dialog.setWindowTitle(_translate("Dialog", "图书信息"))
+        Dialog.setWindowTitle(_translate("Dialog", "添加图书信息"))
         self.label.setText(_translate("Dialog", "书籍名称"))
         self.label_3.setText(_translate("Dialog", "助记码"))
         self.label_4.setText(_translate("Dialog", "条形码"))
@@ -255,59 +248,21 @@ class Ui_Dialog(QDialog):
         self.label_11.setText(_translate("Dialog", "价格"))
         self.label_12.setText(_translate("Dialog", "备注"))
         self.label_13.setText(_translate("Dialog", "种类"))
-        self.btnUpdate.setText(_translate("Dialog", "修改"))
-        self.btnDel.setText(_translate("Dialog", "删除"))
-        self.btnQuit.setText(_translate("Dialog", "退出"))
-        
-    def update_book_detail_alert(self): 
-        box = QMessageBox(QMessageBox.Question, self.tr("提示"), self.tr("是否更新图书信息?!"), QMessageBox.NoButton, self)
-        yr_btn = box.addButton(self.tr("是"), QMessageBox.YesRole)
-        box.addButton(self.tr("否"), QMessageBox.NoRole)
-        box.exec_()
-        if box.clickedButton() == yr_btn:
-            self.closeFromAction = True
-            print ('Bye bye...')
-            self.update_db_book_detail()
-            self.quit_book_detail()
-            return
-        else:
-            print ('继续...')
-        return
-
-    def quit_book_detail(self):
-        '''
-        退出编辑图书详细界面，需要重新刷新图书列表界面
-        '''
-        app.uis['bookinfo'].search_book_info()
-        self.go_back_book_info()        
-
-    def del_book_detail(self):
-        '''
-        删除图书信息，并且返回图书列表界面
-        '''
-        box = QMessageBox(QMessageBox.Question, self.tr("提示"), self.tr("是否删除该图书?!"), QMessageBox.NoButton, self)
-        yr_btn = box.addButton(self.tr("是"), QMessageBox.YesRole)
-        box.addButton(self.tr("否"), QMessageBox.NoRole)
-        box.exec_()
-        if box.clickedButton() == yr_btn:
-            self.del_db_book_detail()
-            self.quit_book_detail()
-            return
-        else:
-            print ('继续...')
-        return
-
-    def selection_book_category(self, index):
-        print(index)
+        self.btnAdd.setText(_translate("Dialog", "确定"))
+        self.btnQuit.setText(_translate("Dialog", "取消"))
 
     def selection_book_category_txt(self, txt):
         self.txBookCategory.setCurrentText(txt)
-        self.bookInfoUpdate['category'] = txt
+        self.bookInfoAdd['category'] = txt
 
-    def del_db_book_detail(self):
-        utils.DBManager().delete_book(self.oldBookInfo)
+    def quit_book_add(self):
+        app.show_window('bookinfo')
+        app.hide_window('bookadd')
 
-    def update_db_book_detail(self):
+    def add_db_book_detail(self):
+        '''
+        添加图书信息到数据库，并且返回图书列表界面
+        '''
         # update book info
         name = self.txBookName.text()
         jzc  = self.txBookJZCode.toPlainText()
@@ -317,21 +272,32 @@ class Ui_Dialog(QDialog):
         price = self.txBookPrice.toPlainText()
         notes = self.txBookNote.toPlainText()
 
-        self.bookInfoUpdate['name'] = name
-        self.bookInfoUpdate['jzc']  = jzc
-        self.bookInfoUpdate['ISBN'] = isbn
-        self.bookInfoUpdate['author'] = author
-        self.bookInfoUpdate['press'] = press
-        self.bookInfoUpdate['price'] = price
-        self.bookInfoUpdate['notes'] = notes
+        if name == '' or jzc == '' or isbn == '' or author == '' or press == '' or price == '': 
+            quitDialog = Ui_Quit_Dialog()
+            quitDialog.show_quit_dialog(self) 
+            """
+            box = QMessageBox(QMessageBox.Question, self.tr("提示"), self.tr("请填写完整图书信息！"), QMessageBox.NoButton, self)
+            yr_btn = box.addButton(self.tr("是"), QMessageBox.YesRole)
+            box.exec_()
+            if box.clickedButton() == yr_btn:
+                #self.closeFromAction = True
+                print ('Bye bye...')
+                return
+            """
+            return
 
-        self.bookInfoUpdate['_id'] = self.oldBookInfo['_id']
+        self.bookInfoAdd['name'] = name
+        self.bookInfoAdd['jzc']  = jzc
+        self.bookInfoAdd['ISBN'] = isbn
+        self.bookInfoAdd['author'] = author
+        self.bookInfoAdd['press'] = press
+        self.bookInfoAdd['price'] = price
+        self.bookInfoAdd['notes'] = notes
 
-        utils.DBManager().update_book_detail(self.bookInfoUpdate)
-
-    def go_back_book_info(self):
-        app.show_window('bookinfo')
-        app.hide_window('bookdetail')
+        utils.DBManager().insert_book_detail(self.bookInfoAdd)
+        #print("add book:{0}".format(self.bookInfoAdd))
+        app.uis['bookinfo'].search_book_info()
+        self.quit_book_add()
 
     """对QDialog类重写，实现一些功能"""""
     def closeEvent(self, event):
