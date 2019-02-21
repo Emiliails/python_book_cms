@@ -94,7 +94,7 @@ get_category():获取图书种类(category)的数据
       app.uis['bookinfo'].search_book_info()
       self.quit_book_add()
       
-3.新增一个关闭窗口的类
+3.新增一个关闭窗口的类（这样可以防止，自身窗口的一个复写的CloseEvent方法的冲突）
   """
   新增一个关闭窗口类
   """
