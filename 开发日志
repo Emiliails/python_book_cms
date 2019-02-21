@@ -1,4 +1,7 @@
----2019.2.20---
+---------------------------------------------------------------------------------------------------------------------
+------------------------------------------------2019.2.20------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------
+
 1.插入图书种类测试数据
   插入mongodb数据
   db.categroy.insert({'name':'科幻'}）
@@ -30,4 +33,82 @@ get_category():获取图书种类(category)的数据
 
 6.简单的在python中调用C
 参考网址：https://www.cnblogs.com/lovephysics/p/7237227.html
+      
+---------------------------------------------------------------------------------------------------------------------
+------------------------------------------------2019.2.21------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------
 
+1.添加删除图书功能
+  def del_book_detail(self):
+    '''
+    删除图书信息，并且返回图书列表界面
+    '''
+    box = QMessageBox(QMessageBox.Question, self.tr("提示"), self.tr("是否删除该图书?!"), QMessageBox.NoButton, self)
+    yr_btn = box.addButton(self.tr("是"), QMessageBox.YesRole)
+    box.addButton(self.tr("否"), QMessageBox.NoRole)
+    box.exec_()
+    if box.clickedButton() == yr_btn:
+        self.del_db_book_detail()
+        self.quit_book_detail()
+        return
+    else:
+        print ('继续...')
+    return
+    
+   def del_db_book_detail(self):
+    utils.DBManager().delete_book(self.oldBookInfo)
+    
+2.添加新增图书功能(简单的对图书信息的完整性进行判断)
+    def add_db_book_detail(self):
+      '''
+      添加图书信息到数据库，并且返回图书列表界面
+      '''
+      # update book info
+      name = self.txBookName.text()
+      jzc  = self.txBookJZCode.toPlainText()
+      isbn = self.txBookBarCode.toPlainText()
+      author = self.txBookAuthor.toPlainText()
+      press = self.txBookPress.toPlainText()
+      price = self.txBookPrice.toPlainText()
+      notes = self.txBookNote.toPlainText()
+
+      if name == '' or jzc == '' or isbn == '' or author == '' or press == '' or price == '': 
+          box = QMessageBox(QMessageBox.Question, self.tr("提示"), self.tr("请填写完整图书信息！"), QMessageBox.NoButton, self)
+          yr_btn = box.addButton(self.tr("是"), QMessageBox.YesRole)
+          box.exec_()
+          if box.clickedButton() == yr_btn:
+              print ('Bye bye...')
+              return
+          return
+
+      self.bookInfoAdd['name'] = name
+      self.bookInfoAdd['jzc']  = jzc
+      self.bookInfoAdd['ISBN'] = isbn
+      self.bookInfoAdd['author'] = author
+      self.bookInfoAdd['press'] = press
+      self.bookInfoAdd['price'] = price
+      self.bookInfoAdd['notes'] = notes
+
+      utils.DBManager().insert_book_detail(self.bookInfoAdd)
+      #print("add book:{0}".format(self.bookInfoAdd))
+      app.uis['bookinfo'].search_book_info()
+      self.quit_book_add()
+      
+3.新增一个关闭窗口的类
+  """
+  新增一个关闭窗口类
+  """
+  class Ui_Quit_Dialog(QDialog):
+
+    def show_quit_dialog(self, dialog):
+        box = QMessageBox(QMessageBox.Question, self.tr("提示"), self.tr("请填写完整图书信息！"), QMessageBox.NoButton, self)
+        yr_btn = box.addButton(self.tr("是"), QMessageBox.YesRole)
+
+        box.move(dialog.pos().x()+dialog.size().width()/2-box.size().width(),
+                dialog.pos().y() + dialog.size().height()/2-box.size().height())
+
+        box.exec_()
+        if box.clickedButton() == yr_btn:
+            #self.closeFromAction = True
+            print ('Bye bye...')
+            return
