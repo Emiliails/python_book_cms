@@ -94,12 +94,9 @@ class Ui_MainWindow(object):
         ret = dbManager.check_user(username, password)
 
         dialog = app.get_window('mainmenu')
-
-        dialog.init_ui({'username':username})
-        dialog.setModal(True)        
-        dialog.setupUi(dialog)
+        dialog.init_ui_data({'username': username})
         dialog.init_ui_action()
-        dialog.show()
 
+        app.show_window('mainmenu')
         app.hide_window('login')
 

@@ -9,8 +9,12 @@ from mainmenu import Ui_Dialog as mainMenuDialog
 from bookinfo import Ui_Dialog as bookInfoDialog 
 # 图书详情界面，可以修改删除
 from bookdetail import Ui_Dialog as bookDetailDialog
-
+# 新增图书界面
 from addbookdetail import Ui_Dialog as bookAddDialog
+# 修改管理员密码界面 
+from changeadminpwd import Ui_Dialog as changeAdminPwdDialog
+
+
 
 import BookApp
 
@@ -28,12 +32,15 @@ print(add_float(a, b))
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)  # 创建一个QApplication，也就是你要开发的软件app
-    mainMenu = mainMenuDialog()
+    
     mainWindow = QtWidgets.QMainWindow()    # 创建一个QMainWindow，用来装载你需要的各种组件、控件
     uiLogin = wLogin(mainWindow)  # ui是Ui_MainWindow()类的实例化对象
     uiLogin.init_ui_action(mainWindow)
     mainWindow.show()                       # 执行QMainWindow的show()方法，显示这个QMainWindow
 
+    # 初始化菜单
+    mainMenu = mainMenuDialog()
+    mainMenu.init_ui(mainMenu)
     
     # 初始化图书信息界面
     bookInfo = bookInfoDialog()
@@ -45,12 +52,16 @@ if __name__ == "__main__":
     bookAdd = bookAddDialog()
     bookAdd.init_ui(bookAdd)
 
+    changeAdminPwd = changeAdminPwdDialog()
+    changeAdminPwd.init_ui(changeAdminPwd)
+
     # 添加所有界面容器uis中
     BookApp.uis['mainmenu'] = mainMenu
     BookApp.uis['login'] = mainWindow
     BookApp.uis['bookinfo'] = bookInfo
     BookApp.uis['bookdetail'] = bookDetail
     BookApp.uis['bookadd'] = bookAdd
+    BookApp.uis['changeadminpwd'] = changeAdminPwd
 
     sys.exit(app.exec_())                   # 使用exit()或者点击关闭按钮退出QApplication
 

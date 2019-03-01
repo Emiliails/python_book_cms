@@ -8,15 +8,16 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets 
 from PyQt5.QtGui import *
-from PyQt5.QtWidgets import QApplication, QDialog, QLabel
+from PyQt5.QtWidgets import QApplication, QDialog, QLabel, QLineEdit, QMessageBox
 
 import BookApp as app
 
 class Ui_Dialog(QDialog):
 
-    def init_ui(self, params):
-        self.username = params['username']
-        
+    def init_ui(self, dialog):
+        self.closeFromAction = False
+        self.setupUi(dialog)
+                
     def setupUi(self, Dialog):
         Dialog.setObjectName("Dialog")
         Dialog.resize(612, 421)
@@ -83,7 +84,7 @@ class Ui_Dialog(QDialog):
 
     def retranslateUi(self, Dialog):
         _translate = QtCore.QCoreApplication.translate
-        Dialog.setWindowTitle(_translate("Dialog", self.username + ", 欢迎登陆图书管理系统"))
+        #Dialog.setWindowTitle(_translate("Dialog", self.username + ", 欢迎登陆图书管理系统"))
         self.btnBookInfo.setText(_translate("Dialog", "图书信息"))
         self.btnBookAdd.setText(_translate("Dialog", "图书入库"))
         self.btnBookSale.setText(_translate("Dialog", "销售查询"))
@@ -91,6 +92,10 @@ class Ui_Dialog(QDialog):
         self.btnSysExit.setText(_translate("Dialog", "系统退出"))
         self.label.setText(_translate("Dialog", "图书管理系统"))
 
+    def init_ui_data(self, params):
+        username = params['username']
+        _translate = QtCore.QCoreApplication.translate
+        self.setWindowTitle(_translate("Dialog", username + ", 欢迎登陆图书管理系统"))
 
     def init_ui_action(self):
         self.btnBookInfo.clicked.connect(self.show_book_info_window)
@@ -102,11 +107,9 @@ class Ui_Dialog(QDialog):
     def show_book_info_window(self): 
         print("show_book_info_window")
         dialog = app.get_window('bookinfo')
-
-        dialog.setModal(True)        
         dialog.init_ui_action()
-        dialog.show()
 
+        app.show_window('bookinfo')
         app.hide_window('mainmenu')
 
 
@@ -117,9 +120,57 @@ class Ui_Dialog(QDialog):
         print("show_book_sale_window")
 
     def show_book_sys_conf_window(self):
-        print("show_book_sys_conf_window")
+        dialog = app.get_window('changeadminpwd')
+        dialog.setModal(True)
+        dialog.init_ui_action()
+
+        app.show_window('changeadminpwd')
+        app.hide_window('mainmenu')
 
     def show_book_exit_window(self):
         print("show_book_exit_window")
+        quitDialog = Ui_Quit_Dialog()
+        quitDialog.show_quit_dialog(self)
+
+
+    """对QDialog类重写，实现一些功能"""""
+    def closeEvent(self, event):
+        if self.closeFromAction:
+            self.closeFromAction = False
+            return
+
+        reply = QtWidgets.QMessageBox.question(self, '提示',"是否退出系统?!",QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No,QtWidgets.QMessageBox.No)
+            
+        if reply == QtWidgets.QMessageBox.Yes:
+            event.accept()
+            app.hide_window('mainmenu')
+            app.show_window('login')
+        else:
+            event.ignore()
+
+
+"""
+新增一个关闭窗口类
+"""
+class Ui_Quit_Dialog(QDialog):
+
+    def show_quit_dialog(self, dialog):
+        box = QMessageBox(QMessageBox.Question, self.tr("提示"), self.tr("是否退出系统?!"), QMessageBox.NoButton, self)
+        yr_btn = box.addButton(self.tr("是"), QMessageBox.YesRole)
+        nr_btn = box.addButton(self.tr("否"), QMessageBox.YesRole)
+
+
+        box.move(dialog.pos().x()+dialog.size().width()/2-box.size().width(),
+                dialog.pos().y() + dialog.size().height()/2-box.size().height())
+
+        box.exec_()
+        if box.clickedButton() == yr_btn:
+            self.closeFromAction = True
+            #self.closeFromAction = True
+            app.hide_window('mainmenu')
+            app.show_window('login')
+            return
+        else:
+            self.closeFromAction = True
 
 
